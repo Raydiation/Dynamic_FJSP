@@ -1,0 +1,12 @@
+**/__pycache__/
+datasets/
+fjsp_benchmark_dy.py
+html/
+reschdule_valid.py
+result/
+runs/
+t.py
+timeline/
+weight/
+valid*
+djsp*
