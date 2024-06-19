@@ -16,16 +16,9 @@ import time
 MAX = float(1e6)
 
 def eval_(episode, valid_sets=None):
-    if args.instance_type == 'FJSP':
-        valid_dir = './datasets/DFJSP'
-        if valid_sets is None:
-            valid_sets = ['(10+20)x10_DFJSP']
-
-    else:
-        valid_dir = './datasets/DJSP'
-        
-        if valid_sets is None:
-            valid_sets = ['(10+20)x10_DJSP']
+    
+    valid_dir = './datasets/DFJSP'
+    valid_sets = ['(10+20)x10_DFJSP']
 
     for _set in valid_sets:
         total_tard = 0.
@@ -55,6 +48,9 @@ def eval_(episode, valid_sets=None):
 def train():
     print("start Training")
     best_valid_makespan = MAX
+    
+    if args.train_arr == False:
+        args.new_job_event = 0
 
     for episode in range(1, args.episode):
 
@@ -76,9 +72,6 @@ def train():
             action_probs.append(action_prob)
             
             if done:
-                if env.check_valid() == False:
-                    with open("./result/{}/err.txt".format(args.date),"a") as outfile:
-                        outfile.write('FAIL!')
 
                 optimizer.zero_grad()
                 tard = env.get_tardiness()

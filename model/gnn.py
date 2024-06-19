@@ -79,10 +79,6 @@ class GNN(nn.Module):
     def forward(self, data):
         x_dict, edge_index_dict, edge_attr_dict= data.x_dict, data.edge_index_dict, data.edge_attr_dict
 
-        # print(f'x : {x_dict}')
-        # print(f'edge_index_dict : {edge_index_dict}')
-        # print(f'edge_attr_dict : {edge_attr_dict}')
-
         x_dict['m'] = self.m_trans_fc(x_dict['m'])
         
         for conv in self.convs:

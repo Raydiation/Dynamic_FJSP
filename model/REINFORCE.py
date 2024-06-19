@@ -11,12 +11,12 @@ class REINFORCE(nn.Module):
     def __init__(self, args):
         super(REINFORCE, self).__init__()
         self.args = args
-        self.num_layers = args.policy_num_layers
+        self.policy_num_layers = args.policy_num_layers
         self.hidden_dim = args.hidden_dim
         self.gnn = GNN(args)
         self.layers = torch.nn.ModuleList()
         self.layers.append(nn.Linear(self.hidden_dim * 2 + 2, self.hidden_dim))
-        for _ in range(self.num_layers - 2):
+        for _ in range(self.policy_num_layers - 2):
             self.layers.append(nn.Linear(self.hidden_dim, self.hidden_dim))
         self.layers.append(nn.Linear(self.hidden_dim, 1))
         
@@ -40,29 +40,25 @@ class REINFORCE(nn.Module):
         score = torch.empty(size=(0, self.args.hidden_dim * 2 + 2)).to(self.args.device)
 
         for op_info in avai_ops:
+            normalize_process_time = torch.tensor([op_info['process_time'] / max_process_time], dtype=torch.float32, device=self.args.device)
+
             score = torch.cat((score, torch.cat((x_dict['m'][op_info['m_id']],
                                                 x_dict['op'][op_unfinished.index(op_info['node_id'])],
                                                 job_srpt[op_info['job_id']].unsqueeze(0),
-                                                torch.tensor(op_info['process_time'] / max_process_time).to(torch.float32).to(self.args.device).unsqueeze(0)),dim=0).unsqueeze(0)), dim=0)
+                                                normalize_process_time),dim=0).unsqueeze(0)), dim=0)
 
-        # print(score)
-
-        for i in range(self.num_layers - 1):
+        for i in range(self.policy_num_layers - 1):
             if self.args.act == 'leaky_relu':
                 score = F.leaky_relu(self.layers[i](score))
             elif self.args.act == 'relu':
                 score = F.relu(self.layers[i](score))
             else:
                 raise "act error"
-        score = self.layers[self.num_layers - 1](score)
+        score = self.layers[self.policy_num_layers - 1](score)
 
         probs = F.softmax(score, dim=0).flatten()
         dist = Categorical(probs)
         idx = torch.argmax(score) if greedy else dist.sample()
-        # if greedy == True:
-        #     idx = torch.argmax(score)
-        # else:
-        #     idx = dist.sample()
         self.log_probs.append(dist.log_prob(idx))
         self.entropies.append(dist.entropy())
         return idx.item(), probs[torch.argmax(score)].item()
@@ -70,12 +66,11 @@ class REINFORCE(nn.Module):
     def calculate_loss(self, tard, baseline):
 
         advantage = (-1.0) * (tard - baseline) / (baseline + 1)
+        advantage = np.sign(advantage) * min(1.0, abs(advantage)) # clip
 
-        advantage = np.sign(advantage) * min(1.0, abs(advantage))
-
-        policy_loss = torch.stack(self.log_probs).mean() * advantage
-        entropy_loss = torch.stack(self.entropies).mean()
-        loss = - policy_loss - entropy_loss * self.args.entropy_coef
+        policy_loss     = torch.stack(self.log_probs).mean() * advantage
+        entropy_loss    = torch.stack(self.entropies).mean()
+        loss            = - policy_loss - entropy_loss * self.args.entropy_coef
 
         return loss, policy_loss, entropy_loss
 

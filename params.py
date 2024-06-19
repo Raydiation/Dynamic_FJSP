@@ -25,6 +25,7 @@ def get_args():
     # args for machine breakdown
     parser.add_argument('--MTBF', type=list, default=[50, 70], help='mean time between failure, T~exp(M_mtbf)')
     parser.add_argument('--MTTR', type=list, default=[10, 20], help='mean time to repair, T~exp(M_mttr)')
+    parser.add_argument('--breakdown_handler', type=str, default='reschedule', help='reschedule / postpone')
 
     # args for RL
     parser.add_argument('--entropy_coef', type=float, default=1e-2)

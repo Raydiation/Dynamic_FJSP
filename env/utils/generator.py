@@ -7,24 +7,6 @@ import time
 
 from itertools import accumulate
 
-#JSP
-def gen_operations_JSP(machine_num, op_process_time_range): 
-    op = []
-    
-    op_num = random.randint(1, 20)
-
-    for op_id in range(op_num):
-        random_size = 1 # the number of usable machine for this operation
-        m_id = sorted(np.random.choice(machine_num, size=random_size, replace=False)) # the set of index of usable machine id with size random_size
-        mach_ptime = []
-        for id in m_id:
-            process_time = np.random.randint(*op_process_time_range)
-            mach_ptime.append((id, process_time))
-        op.append({"id": op_id, "machine_and_processtime": mach_ptime})
-    # print(op)
-    # print("========")
-    return op
-
 # FJSP
 def gen_operations_FJSP(machine_num, op_process_time_range): 
     op = []

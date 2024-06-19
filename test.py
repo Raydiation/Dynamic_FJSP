@@ -70,11 +70,12 @@ def test(test_sets=None):
                             best_tard = min(best_tard, env.get_tardiness())
 
                             print("instance : {}, tard : {}".format(file, env.get_tardiness()))
-                            return
                             break
-                with open('./result/{}/test_result.txt'.format(args.date),"a") as outfile:
-                # with open('./result/heuristic/SPT.txt'.format(args.date),"a") as outfile:
-                    outfile.write(f'instance : {file:50} tard : {best_tard:10} \n')
+            return
+                
+                # with open('./result/{}/test_result.txt'.format(args.date),"a") as outfile:
+                # # with open('./result/heuristic/SPT.txt'.format(args.date),"a") as outfile:
+                #     outfile.write(f'instance : {file:50} tard : {best_tard:10} \n')
 
 if __name__ == '__main__':
     args = get_args()
@@ -82,7 +83,7 @@ if __name__ == '__main__':
     env = JSP_Env(args)
     policy = REINFORCE(args).to(args.device)
     
-    policy.load_state_dict(torch.load('./weight/{}/154000'.format(args.date), map_location=args.device), False)
+    policy.load_state_dict(torch.load('./weight/{}/184000'.format(args.date), map_location=args.device), False)
     with torch.no_grad():
         test()
                     

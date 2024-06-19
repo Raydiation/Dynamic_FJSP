@@ -19,7 +19,7 @@ class Machine:
     
     def process_op(self, op_info):
         machine_avai_time = self.avai_time()
-        start_time = max(op_info["current_time"], machine_avai_time)
+        start_time = max(op_info["start_time"], machine_avai_time)
         op_info["start_time"] = start_time
         finished_time = start_time + op_info["process_time"]
         self.processed_op_history.append(op_info)
@@ -32,7 +32,7 @@ class Machine:
             return self.processed_op_history[-1]["start_time"] + self.processed_op_history[-1]["process_time"]
 
     def get_status(self, current_time):
-        if self.breakdown_time <= current_time  and current_time < self.breakdown_time + self.repair_time:
+        if self.breakdown_time <= current_time and current_time < self.breakdown_time + self.repair_time:
             return BREAKDOWN
         return AVAILABLE if current_time >= self.avai_time() else PROCESSED
 
@@ -55,8 +55,7 @@ class Machine:
             self.repair_time = MAX
             return
             # raise "No event"
-        self.breakdown_time = self.breakdown_event[0][0]
-        self.repair_time = self.breakdown_event[0][1]
+        self.breakdown_time, self.repair_time = self.breakdown_event[0]
 
 class Job:
     def __init__(self, args, job_id, op_config, arrival_time):
@@ -87,13 +86,10 @@ class Job:
         return self.current_op_id == -1
 
     def reset_from(self, op_id):
-        self.current_op_id = op_id
         for _id in range(op_id, len(self.operations)):
             if self.operations[_id].avai_time == MAX:
                 break
             self.operations[_id].reset()
-        
-
 
 class Operation:
     def __init__(self, args, job_id, config, arrival_time):
@@ -103,10 +99,7 @@ class Operation:
             self.avai_time = arrival_time if self.op_id == 0 else MAX
             self.expected_process_time = sum(pair[1] for pair in self.machine_and_processtime) / len(self.machine_and_processtime)
 
-        # print(self.expected_process_time)
-
         self.node_id, self.start_time, self.finish_time = -1, -1, -1
-
         self.selected_machine_id, self.process_time = -1, -1 #for logger
 
     def update(self, start_time, process_time):
