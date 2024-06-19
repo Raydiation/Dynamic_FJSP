@@ -16,11 +16,11 @@ def test(test_sets=None):
         test_dir = './datasets/DFJSP/Base_mk04'
         if test_sets is None:
             test_sets = [
-                            # 'seed_2011_newjob_Tarr=20_breakdown_Tbreak=[60, 80]',
-                            # 'seed_8039_newjob_Tarr=20_breakdown_Tbreak=[40, 60]',
-                            # 'seed_8914_newjob_Tarr=15_breakdown',
-                            # 'seed_6404_newjob_Tarr=20_breakdown',
-                            # 'seed_1468_newjob_Tarr=25_breakdown',
+                            'seed_2011_newjob_Tarr=20_breakdown_Tbreak=[60, 80]',
+                            'seed_8039_newjob_Tarr=20_breakdown_Tbreak=[40, 60]',
+                            'seed_8914_newjob_Tarr=15_breakdown',
+                            'seed_6404_newjob_Tarr=20_breakdown',
+                            'seed_1468_newjob_Tarr=25_breakdown',
                             'seed_1855_newjob_Tarr=30_breakdown',
                         ]
 
@@ -71,11 +71,10 @@ def test(test_sets=None):
 
                             print("instance : {}, tard : {}".format(file, env.get_tardiness()))
                             break
-            return
                 
-                # with open('./result/{}/test_result.txt'.format(args.date),"a") as outfile:
-                # # with open('./result/heuristic/SPT.txt'.format(args.date),"a") as outfile:
-                #     outfile.write(f'instance : {file:50} tard : {best_tard:10} \n')
+                with open('./result/{}/test_result.txt'.format(args.date),"a") as outfile:
+                # with open('./result/heuristic/SPT.txt'.format(args.date),"a") as outfile:
+                    outfile.write(f'instance : {file:50} tard : {best_tard:10} \n')
 
 if __name__ == '__main__':
     args = get_args()
@@ -83,7 +82,7 @@ if __name__ == '__main__':
     env = JSP_Env(args)
     policy = REINFORCE(args).to(args.device)
     
-    policy.load_state_dict(torch.load('./weight/{}/184000'.format(args.date), map_location=args.device), False)
+    policy.load_state_dict(torch.load('./weight/{}/154000'.format(args.date), map_location=args.device), False)
     with torch.no_grad():
         test()
                     
