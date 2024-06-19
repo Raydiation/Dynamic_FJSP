@@ -1,5 +1,12 @@
 **/__pycache__/
-datasets/
+datasets/FJSP
+datasets/DFJSP/Analysis*
+datasets/DFJSP/Random
+datasets/DFJSP/Base_mk04/breakdown
+datasets/DFJSP/Base_mk04/newjob
+datasets/DFJSP/Base_mk04/time_complexity
+datasets/DFJSP/Base_mk04/*.py
+datasets/DFJSP/Base_mk04/Mk04.fjs
 fjsp_benchmark_dy.py
 html/
 reschdule_valid.py
