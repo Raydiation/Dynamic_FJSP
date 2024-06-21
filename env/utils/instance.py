@@ -22,6 +22,8 @@ class JSP_Instance:
 
         self.use_log, self.logger = self.args.use_log, DJSP_Logger()
 
+        self.env_back = None
+
     ##### basic functions
     def generate_case(self):
         self.graph = Graph(self.args, self.machine_num)
@@ -44,10 +46,10 @@ class JSP_Instance:
                     self.unarr_jobs.append(self.create_jobs(arr_time))
 
         if self.args.train_break:
-            for m in self.machines:
-                m.generate_breakdown()
-                self.register_time(m.breakdown_time)
-                self.register_time(m.breakdown_time + m.repair_time)
+            for machine in self.machines:
+                machine.generate_breakdown()
+                self.register_time(machine.breakdown_time)
+                self.register_time(machine.breakdown_time + machine.repair_time)
 
         
     def create_jobs(self, arrival_time):
@@ -67,6 +69,11 @@ class JSP_Instance:
         self.graph = None
         self.generate_case()
         self.logger.reset()
+
+        self.env_back = deepcopy(self)
+
+    def restart(self):
+        self = self.env_back
 
     def load_instance(self, filename, block_breakdown=False):
         self.jobs, self.unarr_jobs, self.time_stamp = [], deque(), []
@@ -115,6 +122,7 @@ class JSP_Instance:
                     self.register_time(self.machines[i].breakdown_time + self.machines[i].repair_time)
 
         self.logger.reset()
+        self.env_back = deepcopy(self)
         
     def done(self):
         if not all(job.done() for job in self.jobs):

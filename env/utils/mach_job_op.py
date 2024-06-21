@@ -2,6 +2,7 @@ import numpy as np
 import random
 from collections import deque
 MAX = 1e6
+from itertools import accumulate
 
 BREAKDOWN = -1
 AVAILABLE, PROCESSED, FUTURE, COMPLETED = 0, 1, 2, 3
@@ -63,10 +64,7 @@ class Job:
         self.operations = [Operation(self.args, self.job_id, config, arrival_time) for config in op_config]
         self.current_op_id = 0 # ready to be processed
 
-        self.acc_expected_process_time = [0]
-        for op in self.operations[::-1]:
-            self.acc_expected_process_time.append(self.acc_expected_process_time[-1] + op.expected_process_time)
-        self.acc_expected_process_time = self.acc_expected_process_time[::-1]
+        self.acc_expected_process_time = list(accumulate([op.expected_process_time for op in self.operations[::-1]]))[::-1]
         self.due_date = int(arrival_time + self.acc_expected_process_time[0] * args.DDT)
 
     def current_op(self):
@@ -86,10 +84,10 @@ class Job:
         return self.current_op_id == -1
 
     def reset_from(self, op_id):
-        for _id in range(op_id, len(self.operations)):
-            if self.operations[_id].avai_time == MAX:
+        for o_id in range(op_id, len(self.operations)):
+            if self.operations[o_id].avai_time == MAX:
                 break
-            self.operations[_id].reset()
+            self.operations[o_id].reset()
 
 class Operation:
     def __init__(self, args, job_id, config, arrival_time):

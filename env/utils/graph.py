@@ -97,6 +97,7 @@ class Graph:
             if status == AVAILABLE:
                 feat.append(0)
             elif status == BREAKDOWN: # for reschedule, if append, use avai time.
+                raise "NO"
                 feat.append((m.breakdown_time + m.repair_time - current_time) / self.max_process_time)
             else:
                 feat.append((m.avai_time() - current_time) / self.max_process_time)
