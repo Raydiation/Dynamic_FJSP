@@ -70,6 +70,7 @@ class JSP_Instance:
         self.generate_case()
         self.logger.reset()
 
+        self.env_back = None
         self.env_back = deepcopy(self)
 
     def restart(self):
@@ -122,6 +123,8 @@ class JSP_Instance:
                     self.register_time(self.machines[i].breakdown_time + self.machines[i].repair_time)
 
         self.logger.reset()
+
+        self.env_back = None
         self.env_back = deepcopy(self)
         
     def done(self):
