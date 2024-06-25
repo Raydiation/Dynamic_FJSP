@@ -12,9 +12,11 @@ def gen_operations_FJSP(machine_num, op_process_time_range):
     op = []
     
     op_num = random.randint(1, machine_num + 2)
+    # op_num = random.randint(2, 4)
 
     for op_id in range(op_num):
         random_size = random.randint(1, machine_num) # the number of usable machine for this operation
+        # random_size = random.randint(1, 3) # the number of usable machine for this operation
         m_id = sorted(np.random.choice(machine_num, size=random_size, replace=False)) # the set of index of usable machine id with size random_size
         mach_ptime = []
         for id in m_id:

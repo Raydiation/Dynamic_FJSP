@@ -4,7 +4,6 @@ from env.utils.mach_job_op import *
 from env.utils.generator import *
 from env.utils.graph import Graph
 import torch
-from djsp_logger import DJSP_Logger
 import time
 from itertools import accumulate
 from copy import deepcopy
@@ -19,8 +18,6 @@ class JSP_Instance:
         self.jobs, self.unarr_jobs, self.machines = [], deque(), []
         self.graph, self.max_process_time = None, 0
         self.current_time, self.time_stamp = 0, []
-
-        self.use_log, self.logger = self.args.use_log, DJSP_Logger()
 
         self.env_back = None
 
@@ -68,7 +65,6 @@ class JSP_Instance:
         self.time_stamp = []
         self.graph = None
         self.generate_case()
-        self.logger.reset()
 
         self.env_back = None
         self.env_back = deepcopy(self)
@@ -122,8 +118,6 @@ class JSP_Instance:
                     self.register_time(self.machines[i].breakdown_time)
                     self.register_time(self.machines[i].breakdown_time + self.machines[i].repair_time)
 
-        self.logger.reset()
-
         self.env_back = None
         self.env_back = deepcopy(self)
         
@@ -168,12 +162,6 @@ class JSP_Instance:
         if self.args.delete_node:
             self.graph.remove_node(job_id, self.jobs[job_id].operations[op_id])
 
-    def log(self, job_id, op_id, machine_id, start_time, process_time):
-        op = Operation(None, job_id, None, 0)
-        op.selected_machine_id, op.op_id = machine_id, op_id
-        op.start_time, op.process_time, op.finish_time = start_time, process_time, start_time + process_time
-        self.logger.add_op(op)
-
     def register_time(self, time):
         index = bisect.bisect_left(self.time_stamp, time)
         if index == len(self.time_stamp) or self.time_stamp[index] != time:
@@ -206,9 +194,6 @@ class JSP_Instance:
                             "process_time"  : machine.repair_time
                         }
                     )
-                    if self.use_log:
-                        raise "not"
-                        self.log(-1, 0, machine.machine_id, machine.breakdown_time, machine.repair_time)
                     machine.next_breakdown_event()
                     self.register_time(machine.breakdown_time)
                     self.register_time(machine.breakdown_time + machine.repair_time)
@@ -239,9 +224,6 @@ class JSP_Instance:
             self.graph.current_op[job_id] = op_id
             self.graph.add_node(node_id, connect_node_ids, self.jobs[job_id].operations[op_id].machine_and_processtime)
         
-        if self.use_log:
-            raise "not"
-            self.log(-1, 0, machine.machine_id, machine.breakdown_time, machine.repair_time)
         machine.next_breakdown_event()
         self.register_time(machine.breakdown_time)
         self.register_time(machine.breakdown_time + machine.repair_time)
@@ -272,9 +254,6 @@ class JSP_Instance:
             self.jobs[job_id].update_current_op(avai_time=finished_time)
         self.register_time(finished_time)
         
-        if self.use_log:
-            raise "not"
-            self.log(-1, 0, machine.machine_id, machine.breakdown_time, machine.repair_time)
         machine.next_breakdown_event()
         self.register_time(machine.breakdown_time)
         self.register_time(machine.breakdown_time + machine.repair_time)
